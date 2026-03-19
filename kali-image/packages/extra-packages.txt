@@ -1,0 +1,14 @@
+# Base desktop and metapackages for an unattended Xfce-oriented Kali install.
+kali-desktop-xfce
+kali-linux-default
+
+# Packages needed by this repo's current shell and helper scripts.
+cowsay
+curl
+network-manager
+network-manager-wireguard
+wireguard-tools
+xfce4-genmon-plugin
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting

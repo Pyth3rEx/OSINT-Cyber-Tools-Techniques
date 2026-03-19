@@ -1,0 +1,49 @@
+#!/bin/sh
+set -eu
+
+usage() {
+    printf 'Usage: %s --username USER\n' "$0" >&2
+    exit 1
+}
+
+username=""
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --username)
+            shift
+            [ "$#" -gt 0 ] || usage
+            username="$1"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+    shift
+done
+
+[ -n "$username" ] || usage
+
+home_dir="$(getent passwd "$username" | cut -d: -f6 || true)"
+[ -n "$home_dir" ] || home_dir="/home/$username"
+
+install -d -m 0755 "$home_dir/Documents/OSINT/Firefox"
+
+if [ -f /etc/skel/.zshrc ]; then
+    cp /etc/skel/.zshrc "$home_dir/.zshrc"
+fi
+
+if [ -f /usr/local/share/osint/browser/bookmarks.html ]; then
+    cp /usr/local/share/osint/browser/bookmarks.html "$home_dir/Documents/OSINT/Firefox/bookmarks.html"
+fi
+
+if [ -f /usr/local/share/osint/README.txt ]; then
+    install -d -m 0755 "$home_dir/Documents/OSINT"
+    cp /usr/local/share/osint/README.txt "$home_dir/Documents/OSINT/README.txt"
+fi
+
+chown -R "$username:$username" "$home_dir"
+
+if command -v chsh >/dev/null 2>&1; then
+    chsh -s /usr/bin/zsh "$username" || true
+fi
